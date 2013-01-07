@@ -56,7 +56,7 @@ packages.each do |devpkg|
   package devpkg
 end
 
-directory src_filepath do
+directory src_dirpath do
   action :create
 end
 
