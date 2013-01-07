@@ -56,7 +56,9 @@ packages.each do |devpkg|
   package devpkg
 end
 
-directory src_filepath
+directory src_filepath do
+  action :create
+end
 
 remote_file nginx_url do
   source nginx_url
