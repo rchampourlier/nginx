@@ -45,7 +45,8 @@ include_recipe "nginx::commons_dir"
 include_recipe "nginx::commons_script"
 include_recipe "build-essential"
 
-src_filepath  = "#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['nginx']['version']}.tar.gz"
+src_dirpath = Chef::Config['file_cache_path'] || '/tmp'
+src_filepath  = "#{src_dirpath}/nginx-#{node['nginx']['version']}.tar.gz"
 packages = value_for_platform(
     ["centos","redhat","fedora","amazon","scientific"] => {'default' => ['pcre-devel', 'openssl-devel']},
     "default" => ['libpcre3', 'libpcre3-dev', 'libssl-dev']
@@ -55,6 +56,8 @@ packages.each do |devpkg|
   package devpkg
 end
 
+directory src_filepath
+
 remote_file nginx_url do
   source nginx_url
   checksum node['nginx']['source']['checksum']
@@ -62,11 +65,14 @@ remote_file nginx_url do
   backup false
 end
 
-user node['nginx']['user'] do
-  system true
-  shell "/bin/false"
-  home "/var/www"
-end
+# TODO
+# Restore, but check if the user exists before trying
+# to create it, or it won't work.
+# user node['nginx']['user'] do
+#   system true
+#   shell "/bin/false"
+#   home "/var/www"
+# end
 
 node.run_state['nginx_force_recompile'] = false
 node.run_state['nginx_configure_flags'] =
